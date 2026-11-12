@@ -41,12 +41,15 @@ export const triggerBuild = async ({ payload, redirectToCIPipeline, showToast = 
             errors.errors.map((err) =>
                 ToastManager.showToast({
                     variant: ToastVariantType.error,
-                    description: err.internalMessage,
+                    description: err.userMessage || '操作失败，请查看服务日志。',
                 }),
             )
         } else {
             errors.errors = errors.errors.filter((error) => {
-                const isNoTaskConfiguredError = redirectToCIPipeline && error.userMessage === NO_TASKS_CONFIGURED_ERROR
+                const isNoTaskConfiguredError =
+                    redirectToCIPipeline &&
+                    (error.internalMessage === NO_TASKS_CONFIGURED_ERROR ||
+                        error.userMessage === NO_TASKS_CONFIGURED_ERROR)
 
                 if (isNoTaskConfiguredError) {
                     ToastManager.showToast({

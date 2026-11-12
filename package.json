@@ -35,6 +35,7 @@
         "yaml": "^2.8.3"
     },
     "scripts": {
+        "check:zh": "node scripts/check-chinese.mjs && node --test scripts/chinese-copy.test.mjs",
         "prepare": "husky install",
         "lint": "tsc --noEmit && eslint 'src/**/*.{js,jsx,ts,tsx}' --max-warnings 0",
         "lint-fix": "eslint 'src/**/*.{js,jsx,ts,tsx}' --fix",

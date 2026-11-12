@@ -66,7 +66,7 @@ const UploadChartModal = ({ closeUploadPopup }: UploadChartModalType) => {
                     } else if (error.errors[0].code === SERVER_ERROR_CODES.CHART_NAME_RESERVED) {
                         setErrorData({
                             title: error.errors[0]?.userMessage || '',
-                            message: [error.errors[0]?.internalMessage || ''],
+                            message: [error.errors[0]?.userMessage || '上传失败，请检查 Chart 文件。'],
                         })
                     } else {
                         setErrorData({

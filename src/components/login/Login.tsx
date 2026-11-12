@@ -27,7 +27,6 @@ import {
     getCookie,
     Host,
     Icon,
-    LoginBanner,
     motion,
     ROUTER_URLS,
     SSOProviderIcon,
@@ -43,6 +42,7 @@ import { TOKEN_COOKIE_NAME, URLS } from '../../config'
 import { dashboardAccessed } from '../../services/service'
 import { LOGIN_CARD_ANIMATION_VARIANTS, SSOProvider } from './constants'
 import { LoginForm } from './LoginForm'
+import { LoginIntroduction } from './LoginIntroduction'
 
 import './login.scss'
 
@@ -190,7 +190,7 @@ const Login = () => {
                         className="login-image-container flex br-12 border__primary bg__primary h-100 w-100"
                     />
                 ) : (
-                    <LoginBanner />
+                    <LoginIntroduction />
                 )}
             </div>
             <div className="flex">

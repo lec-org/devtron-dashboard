@@ -54,4 +54,8 @@ yalc.lock
 .pnp.*
 
 .env.secrets
-scripts/
+scripts/*
+!scripts/chinese-copy.mjs
+!scripts/chinese-copy-plugin.mjs
+!scripts/chinese-copy.test.mjs
+!scripts/check-chinese.mjs

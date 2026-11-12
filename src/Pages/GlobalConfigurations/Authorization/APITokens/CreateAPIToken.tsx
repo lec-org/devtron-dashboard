@@ -240,7 +240,11 @@ const CreateAPIToken = ({
             showError(err)
             if (err instanceof ServerErrors && Array.isArray(err.errors)) {
                 const _invalidNameErr = err.errors[0]
-                if (_invalidNameErr.userMessage.includes('please use another name')) {
+                if (
+                    /please use another name|请使用其他名称/.test(
+                        `${_invalidNameErr.internalMessage ?? ''} ${_invalidNameErr.userMessage ?? ''}`,
+                    )
+                ) {
                     setFormDataErrorObj({
                         ...formDataErrorObj,
                         invalidName: true,

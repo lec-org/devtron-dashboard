@@ -20,6 +20,8 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import * as Sentry from '@sentry/browser'
 import { CaptureConsole } from '@sentry/integrations'
 import { BrowserTracing } from '@sentry/tracing'
+import dayjs from 'dayjs'
+import moment from 'moment'
 
 import {
     customEnv,
@@ -31,7 +33,14 @@ import {
     UserEmailProvider,
 } from '@devtron-labs/devtron-fe-common-lib'
 
+import 'moment/locale/zh-cn'
+import 'dayjs/locale/zh-cn'
+
 import App from './App'
+
+// 日期和相对时间使用中文，应用入口与静态页面保持一致。
+moment.locale('zh-cn')
+dayjs.locale('zh-cn')
 
 declare global {
     interface Window {

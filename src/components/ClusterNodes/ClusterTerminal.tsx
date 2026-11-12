@@ -213,10 +213,10 @@ const ClusterTerminal = ({
 
         showError(error)
         if (error instanceof ServerErrors && Array.isArray(error.errors)) {
-            error.errors.forEach(({ userMessage }) => {
-                if (userMessage === CLUSTER_STATUS.SESSION_LIMIT_REACHED) {
+            error.errors.forEach(({ userMessage, internalMessage }) => {
+                if ([internalMessage, userMessage].includes(CLUSTER_STATUS.SESSION_LIMIT_REACHED)) {
                     setRetry(true)
-                } else if (userMessage === CLUSTER_STATUS.POD_TERMINATED) {
+                } else if ([internalMessage, userMessage].includes(CLUSTER_STATUS.POD_TERMINATED)) {
                     setUpdate(false)
                     setPodCreated(false)
                     setManifestData('')
@@ -347,11 +347,11 @@ const ClusterTerminal = ({
                         setPodCreated(false)
                         setTerminalCleared(!terminalCleared)
                         if (error instanceof ServerErrors && Array.isArray(error.errors)) {
-                            error.errors.forEach(({ userMessage }) => {
-                                if (userMessage === CLUSTER_STATUS.SESSION_LIMIT_REACHED) {
+                            error.errors.forEach(({ userMessage, internalMessage }) => {
+                                if ([internalMessage, userMessage].includes(CLUSTER_STATUS.SESSION_LIMIT_REACHED)) {
                                     setRetry(true)
                                     setConnectTerminal(true)
-                                } else if (userMessage === CLUSTER_STATUS.POD_TERMINATED) {
+                                } else if ([internalMessage, userMessage].includes(CLUSTER_STATUS.POD_TERMINATED)) {
                                     setUpdate(false)
                                     setManifestData('')
                                     setConnectTerminal(false)

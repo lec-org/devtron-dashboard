@@ -28,6 +28,7 @@ import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfil
 import { VitePWA } from 'vite-plugin-pwa'
 // import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
 import { compression, defineAlgorithm } from 'vite-plugin-compression2'
+import chineseCopy from './scripts/chinese-copy-plugin.mjs'
 
 const WRONG_CODE = `import { bpfrpt_proptype_WindowScroller } from "../WindowScroller.js";`
 const TARGET_URL = 'https://preview.devtron.ai/'
@@ -101,6 +102,9 @@ export default defineConfig(({ mode }) => {
         base: '/dashboard',
         define: {
             global: 'globalThis',
+        },
+        optimizeDeps: {
+            exclude: ['@devtron-labs/devtron-fe-common-lib'],
         },
         preview: {
             port: 3000,
@@ -181,6 +185,7 @@ export default defineConfig(({ mode }) => {
             assetsInlineLimit: 0,
         },
         plugins: [
+            chineseCopy(),
             // @TODO: Check if we can remove the config object inside the react plugin
             react({
                 // Use React plugin in all *.jsx and *.tsx files
@@ -238,9 +243,9 @@ export default defineConfig(({ mode }) => {
                 },
                 manifest: {
                     short_name: 'Devtron',
-                    name: 'Devtron Dashboard',
+                    name: 'Devtron 发布平台',
                     description:
-                        'Easily containerize your application to move it to Kubernetes in the cloud or in your own data center. Build, test, secure, deploy, and manage your applications on Kubernetes using open-source software.',
+                        '统一管理应用的检查、构建、部署和运行状态。',
                     icons: [
                         {
                             src: 'favicon.ico',
