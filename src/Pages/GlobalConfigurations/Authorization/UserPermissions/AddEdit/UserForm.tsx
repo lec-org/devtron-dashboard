@@ -31,6 +31,7 @@ import {
     showError,
     ToastManager,
     ToastVariantType,
+    useAsync,
     useMainContext,
     UserGroupType,
     UserStatus,
@@ -42,6 +43,8 @@ import { deepEqual, importComponentFromFELibrary, validateEmail } from '../../..
 import { API_STATUS_CODES, REQUIRED_FIELDS_MISSING } from '../../../../../config'
 import { createOrUpdateUser, deleteUser } from '../../authorization.service'
 import { useAuthorizationContext } from '../../AuthorizationProvider'
+import { getMemberLabel, LecMemberPicker } from '../../LecMembers'
+import { getLecMembers } from '../../LecMembers/service'
 import { getDefaultUserStatusAndTimeout } from '../../libUtils'
 import { excludeKeyAndClusterValue } from '../../Shared/components/K8sObjectPermissions/utils'
 import {
@@ -64,6 +67,13 @@ const createOption = (label: string) => ({
 const UserForm = ({ isAddMode }: { isAddMode: boolean }) => {
     const { serverMode, isSuperAdmin } = useMainContext()
 
+    const [, memberResponse, memberError] = useAsync(
+        async () => (isSuperAdmin ? (await getLecMembers()).result : { enabled: false, members: [] }),
+        [isSuperAdmin],
+    )
+    const memberDirectory = memberResponse
+    const isLec = memberDirectory?.enabled === true
+
     const { isAutoAssignFlowEnabled } = useAuthorizationContext()
 
     const {
@@ -83,6 +93,7 @@ const UserForm = ({ isAddMode }: { isAddMode: boolean }) => {
         allowManageAllAccess,
     } = usePermissionConfiguration()
     const _userData = userData as User
+    const memberLabel = memberDirectory?.members.find((member) => member.account === _userData?.emailId)
 
     const [emailState, setEmailState] = useState<{ emails: OptionType[]; inputEmailValue: string; emailError: string }>(
         { emails: [], inputEmailValue: '', emailError: '' },
@@ -194,7 +205,11 @@ const UserForm = ({ isAddMode }: { isAddMode: boolean }) => {
     const populateDataFromAPI = (data: User) => {
         const { emailId, userStatus: _userStatus, timeToLive: _timeToLive, userGroups } = data
 
-        setEmailState({ emails: [{ label: emailId, value: emailId }], inputEmailValue: '', emailError: '' })
+        setEmailState({
+            emails: [{ label: memberLabel ? getMemberLabel(memberLabel) : emailId, value: emailId }],
+            inputEmailValue: '',
+            emailError: '',
+        })
         setSelectedUserGroups(userGroups)
         handleUserStatusUpdate(_userStatus, _timeToLive)
     }
@@ -205,7 +220,7 @@ const UserForm = ({ isAddMode }: { isAddMode: boolean }) => {
         } else {
             handleUserStatusUpdate(UserStatus.active, '')
         }
-    }, [_userData])
+    }, [_userData, memberLabel])
 
     const handleInputChange = (inputEmailValue) => {
         setEmailState((prevEmailState) => ({ ...prevEmailState, inputEmailValue, emailError: '' }))
@@ -308,28 +323,43 @@ const UserForm = ({ isAddMode }: { isAddMode: boolean }) => {
                     {isAddMode && (
                         <>
                             {isAutoAssignFlowEnabled && <UserPermissionsInfoBar />}
-                            <SelectPicker
-                                required
-                                label="Email addresses"
-                                isMulti
-                                options={[]}
-                                autoFocus
-                                isClearable
-                                placeholder="Type email and press enter"
-                                inputValue={emailState.inputEmailValue}
-                                value={emailState.emails}
-                                onBlur={handleCreatableBlur}
-                                onInputChange={handleInputChange}
-                                onKeyDown={handleKeyDown}
-                                onChange={handleEmailChange}
-                                inputId="email-addresses"
-                                error={emailState.emailError}
-                                multiSelectProps={{
-                                    getIsOptionValid: getIsEmailInputValid,
-                                }}
-                                shouldHideMenu
-                                size={ComponentSizeType.large}
-                            />
+                            {isLec ? (
+                                <LecMemberPicker
+                                    members={memberDirectory.members}
+                                    value={emailState.emails}
+                                    onChange={handleEmailChange}
+                                    error={emailState.emailError}
+                                    disabled={submitting}
+                                />
+                            ) : (
+                                <SelectPicker
+                                    required
+                                    label="Email addresses"
+                                    isMulti
+                                    options={[]}
+                                    autoFocus
+                                    isClearable
+                                    placeholder="Type email and press enter"
+                                    inputValue={emailState.inputEmailValue}
+                                    value={emailState.emails}
+                                    onBlur={handleCreatableBlur}
+                                    onInputChange={handleInputChange}
+                                    onKeyDown={handleKeyDown}
+                                    onChange={handleEmailChange}
+                                    inputId="email-addresses"
+                                    error={emailState.emailError}
+                                    multiSelectProps={{
+                                        getIsOptionValid: getIsEmailInputValid,
+                                    }}
+                                    shouldHideMenu
+                                    size={ComponentSizeType.large}
+                                />
+                            )}
+                            {memberError && (
+                                <span role="alert" className="cr-5">
+                                    成员目录暂时不可用，请稍后重试。
+                                </span>
+                            )}
                             <div className="dc__border-top" />
                         </>
                     )}
@@ -359,7 +389,7 @@ const UserForm = ({ isAddMode }: { isAddMode: boolean }) => {
                         text="Save"
                         onClick={handleSubmit}
                         size={ComponentSizeType.medium}
-                        disabled={isSaveDisabled}
+                        disabled={isSaveDisabled || (isSuperAdmin && (!memberResponse || Boolean(memberError)))}
                         isLoading={submitting}
                         buttonProps={{
                             type: 'submit',

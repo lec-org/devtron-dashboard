@@ -53,6 +53,7 @@ const UserGroupCell = importComponentFromFELibrary('UserGroupCell', null, 'funct
 const UserPermissionRow = ({
     id,
     emailId,
+    displayName,
     lastLoginTime,
     userStatus,
     timeToLive,
@@ -137,7 +138,7 @@ const UserPermissionRow = ({
                 ) : (
                     <span className="dc__ellipsis-right">
                         <Link className="anchor dc__ellipsis-right" to={`${id}`}>
-                            {emailId}
+                            {displayName || emailId}
                         </Link>
                     </span>
                 )}

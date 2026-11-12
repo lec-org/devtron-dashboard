@@ -26,6 +26,7 @@ export interface SSOConfigDTO {
     id: number
     globalAuthConfigType: string
     name: string
+    label?: string
     url: string
 }
 
@@ -41,6 +42,8 @@ export interface SSOConfigType extends Partial<Pick<SSOConfigDTO, 'active' | 'na
 }
 
 export interface SSOLoginState {
+    /** LecSSO 由部署配置托管，页面只展示接入状态。 */
+    isLecManaged: boolean
     view: string
     statusCode: number
     saveLoading: boolean

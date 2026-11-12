@@ -132,7 +132,7 @@ const Login = () => {
                     <div key={item.name}>
                         <Button
                             variant={ButtonVariantType.secondary}
-                            text={`Login with ${item.name}`}
+                            text={`使用 ${item.label || item.name} 登录`}
                             key={item.name}
                             onClick={onClickSSO}
                             dataTestId={`login-with-${item.name}`}

@@ -51,6 +51,7 @@ import Check from '../../assets/icons/ic-check-circle-green.svg?react'
 import Wrong from '../../assets/icons/ic-close-circle.svg?react'
 import { sortObjectArrayAlphabetically } from '../common/helpers/Helpers'
 import { deleteMaterial } from './material.service'
+import { LecRepositoryPicker } from './LecRepositoryPicker'
 import {
     DeleteComponentsName,
     DC_MATERIAL_VIEW__ISMULTI_CONFIRMATION_MESSAGE,
@@ -609,6 +610,15 @@ export class MaterialView extends Component<MaterialViewProps, MaterialViewState
         startIcon: <GitProviderIcon gitRepoUrl={provider.url} />,
     })
 
+    handleLecRepositoryChange = (url: string) => {
+        const provider = this.props.providers.find((item) => item.name === 'lec-org GitHub App')
+        if (provider) {
+            this.props.handleProviderChange(this.getGitProviderOption(provider), url)
+        } else {
+            this.props.handleUrlChange({ target: { value: url } })
+        }
+    }
+
     handleGitProviderChange: SelectPickerProps['onChange'] = (selected) => {
         this.props.handleProviderChange(selected, this.props.material.url)
     }
@@ -700,14 +710,20 @@ export class MaterialView extends Component<MaterialViewProps, MaterialViewState
                         />
                     </div>
                     <div className="flex-grow-1">
-                        <CustomInput
-                            label={this.renderGitRepoUrlLabel()}
-                            name="Git Repo URL"
-                            placeholder={this.gitAuthType('placeholder')}
-                            value={`${this.props.material.url}`}
-                            onChange={this.props.handleUrlChange}
+                        <LecRepositoryPicker
+                            value={this.props.material.url}
+                            onChange={this.handleLecRepositoryChange}
                             error={this.props.isError.url}
-                        />
+                        >
+                            <CustomInput
+                                label={this.renderGitRepoUrlLabel()}
+                                name="Git Repo URL"
+                                placeholder={this.gitAuthType('placeholder')}
+                                value={`${this.props.material.url}`}
+                                onChange={this.props.handleUrlChange}
+                                error={this.props.isError.url}
+                            />
+                        </LecRepositoryPicker>
                     </div>
                 </div>
                 {!this.props.isCreateAppView && (

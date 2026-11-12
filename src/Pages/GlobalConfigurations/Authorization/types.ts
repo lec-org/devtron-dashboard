@@ -134,6 +134,7 @@ export interface UserDto
      * Email of the user
      */
     email_id: string
+    displayName?: string
     /**
      * Status of the user
      *

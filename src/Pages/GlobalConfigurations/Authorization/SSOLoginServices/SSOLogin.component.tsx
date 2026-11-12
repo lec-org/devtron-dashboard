@@ -60,6 +60,7 @@ import UsersIcon from '@Icons/ic-users.svg?react'
 import { withGlobalConfiguration } from '../../../../components/globalConfigurations/GlobalConfigurationProvider'
 import { HEADER_TEXT, SWITCH_ITEM_SEGMENTS, SwitchItemValues, ViewType } from '../../../../config'
 import { AutoAssignToggleTile, getAuthorizationGlobalConfig, UserPermissionConfirmationModal } from './AutoAssign'
+import { LecSSOStatus } from './LecSSOStatus'
 import {
     AUTHORIZATION_CONFIG_TYPES,
     autoAssignPermissionsFlowActiveProviders,
@@ -117,6 +118,7 @@ class SSOLogin extends Component<SSOLoginProps & RouterV5Props<{}>, SSOLoginStat
     constructor(props) {
         super(props)
         this.state = {
+            isLecManaged: false,
             view: ViewType.LOADING,
             statusCode: 0,
             sso: '',
@@ -166,7 +168,9 @@ class SSOLogin extends Component<SSOLoginProps & RouterV5Props<{}>, SSOLoginStat
                 return { ssoConfig, ssoName }
             })
             .then(({ ssoConfig, ssoName }) => {
-                if (ssoConfig?.id) {
+                if (ssoConfig?.label === 'LecSSO') {
+                    this.setState({ view: ViewType.FORM, isLecManaged: true })
+                } else if (ssoConfig?.id) {
                     getSSOConfig(ssoConfig.name.toLowerCase())
                         .then((response) => {
                             this.setConfig(response, ssoConfig.name.toLowerCase())
@@ -737,6 +741,10 @@ class SSOLogin extends Component<SSOLoginProps & RouterV5Props<{}>, SSOLoginStat
                     <ErrorScreenManager code={this.state.statusCode} />
                 </div>
             )
+        }
+
+        if (this.state.isLecManaged) {
+            return <LecSSOStatus />
         }
 
         const renderInfoText = (): JSX.Element => (
